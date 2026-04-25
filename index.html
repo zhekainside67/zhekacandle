@@ -386,7 +386,12 @@
         }
         function addToHistory(c) { history.unshift(c); if (history.length > 25) history.pop(); updateHistoryUI(); }
         function getCrashPoint() { return Math.random() < 0.5 ? 1 + Math.random()*0.49 : 1.5 + Math.random()*0.5; }
-        function easeOutCubic(x) { return 1 - Math.pow(1 - x, 3); }
+        
+        // Новая функция ускорения: сначала медленно, потом быстро
+        function easeInCubic(x) {
+            return x * x * x;
+        }
+        
         function endRound(isCrash, finalMult) {
             if (rocketInterval) clearInterval(rocketInterval);
             rocketActive = false;
@@ -436,7 +441,8 @@
                 if (!rocketActive) return;
                 let elapsed = Date.now() - start;
                 let progress = Math.min(elapsed / duration, 1);
-                let eased = easeOutCubic(progress);
+                // Сначала медленно (easeInCubic), к концу ускорение
+                let eased = easeInCubic(progress);
                 let mult = 1 + (crashPoint - 1) * eased;
                 if (mult > crashPoint) mult = crashPoint;
                 currentMultiplier = parseFloat(mult.toFixed(3));
